@@ -1,0 +1,7 @@
+numpy
+librosa
+scipy
+tones
+fastapi
+uvicorn
+python-multipart
