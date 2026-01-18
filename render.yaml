@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: hnr-py-util
+    env: python
+    buildCommand: apt-get update && apt-get install -y lame
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
