@@ -14,26 +14,25 @@ def generate_song_artifacts(rtttl_source: str, output_mp3: str, song_id: int = 2
     fs, ds = zip(*[t for t in rtttl.notes()])
     fs, ds = list(fs), list(ds)
 
-    print(f"static const int song{song_id}_melody[]={{", end="")
-    for f in fs:
-        print(int(f), end=",")
-    print(0, end="")
-    print("};")
+    lines = []
+    melody = ",".join(str(int(f)) for f in fs) + ",0"
+    lines.append(f"static const int song{song_id}_melody[]={{{melody}}};")
 
-    print(f"static const int song{song_id}_note_ticks[]={{", end="")
     t = 0
+    ticks = []
     for d in ds:
-        print(int(t), end=",")
+        ticks.append(str(int(t)))
         t += d
-    print(int(t), end="")
-    print("};")
-    
-    print(f"static const int song{song_id}_lanes[] = {{{', '.join(map(str, lanes))}}};")
-    print(f"static const int song{song_id}_tickNs[] = {{{', '.join(map(str, (int(t/10) for t in times)))}}};")
-    print(f"static const int song{song_id}_num_notes={len(lanes)};")
+    ticks.append(str(int(t)))
+    lines.append(f"static const int song{song_id}_note_ticks[]={{{','.join(ticks)}}};")
 
-    return output_mp3
+    lines.append(f"static const int song{song_id}_lanes[] = {{{', '.join(map(str, lanes))}}};")
+    lines.append(f"static const int song{song_id}_tickNs[] = {{{', '.join(map(str, (int(t/10) for t in times)))}}};")
+    lines.append(f"static const int song{song_id}_num_notes={len(lanes)};")
+
+    return "\n".join(lines)
 
 
 if __name__ == "__main__":
-    generate_song_artifacts(rtttl_str, "audio.mp3", song_num)
+    output = generate_song_artifacts(rtttl_str, "audio.mp3", song_num)
+    print(output)
